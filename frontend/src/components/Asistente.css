@@ -1,0 +1,155 @@
+.asistente-boton-flotante {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 1000;
+}
+
+.asistente-panel {
+  position: fixed;
+  right: 25px;
+  bottom: 100px;
+  width: 380px;
+  height: 560px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.asistente-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.asistente-header h2 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+}
+
+.asistente-disponible {
+  font-size: 13px;
+}
+
+.asistente-no-disponible {
+  font-size: 13px;
+}
+
+.asistente-cerrar {
+  border: none;
+  background: transparent;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.asistente-contexto {
+  padding: 8px 15px;
+  font-size: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.asistente-mensajes {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.asistente-bienvenida {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.asistente-mensaje {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.asistente-mensaje strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.asistente-mensaje p {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.asistente-mensaje.usuario {
+  background: #f1f1f1;
+}
+
+.asistente-mensaje.asistente {
+  background: #f7f7f7;
+}
+
+.asistente-mensaje.error {
+  background: #ffecec;
+}
+
+.asistente-entrada {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #ddd;
+}
+
+.asistente-entrada textarea {
+  flex: 1;
+  min-height: 45px;
+  max-height: 100px;
+  resize: vertical;
+  padding: 8px;
+}
+
+.asistente-entrada button {
+  cursor: pointer;
+}
+
+.asistente-entrada button:disabled {
+  cursor: not-allowed;
+}
+
+.asistente-aviso {
+  padding: 20px;
+  line-height: 1.5;
+}
+
+.asistente-microfono {
+  min-width: 45px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.asistente-microfono:disabled {
+  cursor: not-allowed;
+}
+
+.asistente-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.asistente-voz {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}

@@ -1,0 +1,135 @@
+**********C0NSULTAS SQL**********
+
+SELECT *
+FROM ciclista;
+
+{ t | ciclista(t) }
+
+ciclista
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista;
+
+{ t.nombre | ciclista(t) }
+
+π nombre (ciclista)
+
+----------------------------------------------------------------
+
+SELECT nombre, edad
+FROM ciclista;
+
+{ t.nombre, t.edad | ciclista(t) }
+
+π nombre, edad (ciclista)
+
+----------------------------------------------------------------
+
+SELECT *
+FROM ciclista
+WHERE edad > 20;
+
+{ t | ciclista(t) ∧ t.edad > 20 }
+
+σ edad > 20 (ciclista)
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista
+WHERE edad > 20;
+
+{ t.nombre | ciclista(t) ∧ t.edad > 20 }
+
+π nombre (σ edad > 20 (ciclista))
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista
+WHERE nomeq = 'Banesto';
+
+{ t.nombre | ciclista(t) ∧ t.nomeq = 'Banesto' }
+
+π nombre (σ nomeq = 'Banesto' (ciclista))
+
+----------------------------------------------------------------
+
+SELECT nombre, edad
+FROM ciclista
+WHERE edad > 20 AND nomeq = 'Banesto';
+
+{ t.nombre, t.edad | ciclista(t) ∧ (t.edad > 20 ∧ t.nomeq = 'Banesto') }
+
+π nombre, edad (σ edad > 20 ∧ nomeq = 'Banesto' (ciclista))
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista
+WHERE edad < 20 OR edad > 30;
+
+{ t.nombre | ciclista(t) ∧ (t.edad < 20 ∨ t.edad > 30) }
+
+π nombre (σ edad < 20 ∨ edad > 30 (ciclista))
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista
+WHERE edad > 20
+  AND (nomeq = 'Banesto' OR nomeq = 'Kelme');
+
+{ t.nombre | ciclista(t) ∧ (t.edad > 20 ∧ (t.nomeq = 'Banesto' ∨ t.nomeq = 'Kelme')) }
+
+π nombre (σ edad > 20 ∧ (nomeq = 'Banesto' ∨ nomeq = 'Kelme') (ciclista))
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista
+WHERE nomeq <> 'Banesto';
+
+{ t.nombre | ciclista(t) ∧ t.nomeq ≠ 'Banesto' }
+
+π nombre (σ nomeq ≠ 'Banesto' (ciclista))
+
+----------------------------------------------------------------
+
+SELECT c.nombre
+FROM ciclista c
+WHERE c.edad > 20;
+
+{ t.nombre | ciclista(t) ∧ t.edad > 20 }
+
+π c.nombre (σ c.edad > 20 (ρ c (ciclista)))        ////  π c.nombre (σ c.edad > 20 (ciclista))
+
+----------------------------------------------------------------
+
+SELECT nombre, edad
+FROM ciclista
+WHERE (edad < 20 OR edad > 30)
+  AND nomeq <> 'Banesto';
+
+{ t.nombre, t.edad | ciclista(t) ∧ ((t.edad < 20 ∨ t.edad > 30) ∧ t.nomeq ≠ 'Banesto') }
+
+π nombre, edad (σ (edad < 20 ∨ edad > 30) ∧ nomeq ≠ 'Banesto' (ciclista))
+
+----------------------------------------------------------------
+
+SELEC nombre
+FROM ciclista;
+
+----------------------------------------------------------------
+
+SELECT nombre
+FROM ciclista
+WHERE edad >> 20;
+
+----------------------------------------------------------------
+
+
+
+

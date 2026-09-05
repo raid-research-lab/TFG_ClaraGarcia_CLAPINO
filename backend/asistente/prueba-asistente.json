@@ -1,0 +1,8 @@
+{
+  "pregunta": "Explicame esta consulta",
+  "contexto": {
+    "sql": "SELECT * FROM ciclista;",
+    "crt": "",
+    "ar": ""
+  }
+}
