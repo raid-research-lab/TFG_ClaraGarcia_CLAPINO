@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "./api";
 import "./App.css";
 import SymbolBar from "./components/SymbolBar";
 import Inicio from "./components/Inicio";
@@ -19,13 +20,13 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const [dbConfig, setDbConfig] = useState({
-    host: "localhost",
-    port: "3306",
-    user: "root",
-    password: "",
-    database: ""
-  });
+  /*
+   * Las credenciales de MySQL están configuradas en el servidor.
+   * Aquí solo se maneja el NOMBRE de la base de datos elegida entre
+   * las que el servidor ofrece.
+   */
+  const [basesDisponibles, setBasesDisponibles] = useState([]);
+  const [baseSeleccionada, setBaseSeleccionada] = useState("");
 
   const [connectedDb, setConnectedDb] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -34,7 +35,7 @@ function App() {
     const comprobarSesion = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/auth/me",
+          `${API_BASE}/auth/me`,
           {
             credentials: "include"
           }
@@ -64,6 +65,44 @@ function App() {
 
     comprobarSesion();
   }, []);
+
+  /*
+   * Cuando hay usuario, se piden al servidor las bases de datos
+   * disponibles.
+   */
+  useEffect(() => {
+    if (!usuario) {
+      return;
+    }
+
+    const cargarBases = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/db`, {
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+
+        setBasesDisponibles(data.bases || []);
+
+        setBaseSeleccionada((actual) => {
+          return actual || data.porDefecto || "";
+        });
+
+      } catch (error) {
+        console.error(
+          "Error cargando las bases de datos:",
+          error
+        );
+      }
+    };
+
+    cargarBases();
+  }, [usuario]);
 
   const crtSymbols = [
     { symbol: "∧", label: "AND lógico" },
@@ -105,12 +144,19 @@ function App() {
     try {
       setError(null);
 
-      const response = await fetch("http://localhost:5000/api/db/test", {
+      if (!baseSeleccionada) {
+        throw new Error("Debes elegir una base de datos");
+      }
+
+      const response = await fetch(`${API_BASE}/api/db/test`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(dbConfig)
+        body: JSON.stringify({
+          database: baseSeleccionada
+        })
       });
 
       const data = await response.json();
@@ -119,7 +165,7 @@ function App() {
         throw new Error(data.error);
       }
 
-      setConnectedDb(dbConfig);
+      setConnectedDb({ database: data.database });
       setShowModal(false);
     } catch (err) {
       setConnectedDb(null);
@@ -141,15 +187,16 @@ function App() {
       }
 
       const response = await fetch(
-        "http://localhost:5000/execute-sql",
+        `${API_BASE}/execute-sql`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
             sql: sqlQuery,
-            dbConfig: connectedDb
+            database: connectedDb.database
           })
         }
       );
@@ -176,9 +223,10 @@ function App() {
       }
 
       const response = await fetch(
-        "http://localhost:5000/traducir-sql",
+        `${API_BASE}/traducir-sql`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },
@@ -211,9 +259,10 @@ function App() {
       }
 
       const response = await fetch(
-        "http://localhost:5000/traducir-sql",
+        `${API_BASE}/traducir-sql`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },
@@ -248,9 +297,10 @@ function App() {
       }
 
       const response = await fetch(
-        "http://localhost:5000/traducir-crt",
+        `${API_BASE}/traducir-crt`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },
@@ -301,7 +351,7 @@ function App() {
     try {
 
       const response = await fetch(
-        "http://localhost:5000/auth/logout",
+        `${API_BASE}/auth/logout`,
         {
           method: "POST",
           credentials: "include"
@@ -510,68 +560,35 @@ function App() {
           <div className="modal">
             <h2>Conectar Base de Datos</h2>
 
-            <input
-              type="text"
-              placeholder="Host"
-              value={dbConfig.host}
-              onChange={(e) =>
-                setDbConfig({ 
-                  ...dbConfig, 
-                  host: e.target.value 
-                })
-              }
-            />
+            <p className="modal-texto">
+              Elige una de las bases de datos disponibles.
+              La conexión con MySQL está configurada en el servidor.
+            </p>
 
-            <input
-              type="text"
-              placeholder="Puerto"
-              value={dbConfig.port}
+            <select
+              value={baseSeleccionada}
               onChange={(e) =>
-                setDbConfig({ 
-                  ...dbConfig, 
-                  port: e.target.value 
-                })
+                setBaseSeleccionada(e.target.value)
               }
-            />
+            >
+              {basesDisponibles.length === 0 && (
+                <option value="">
+                  No hay bases de datos disponibles
+                </option>
+              )}
 
-            <input
-              type="text"
-              placeholder="Usuario"
-              value={dbConfig.user}
-              onChange={(e) =>
-                setDbConfig({ 
-                  ...dbConfig, 
-                  user: e.target.value 
-                })
-              }
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              value={dbConfig.password}
-              onChange={(e) =>
-                setDbConfig({ 
-                  ...dbConfig, 
-                  password: e.target.value 
-                })
-              }
-            />
-
-            <input
-              type="text"
-              placeholder="Base de datos"
-              value={dbConfig.database}
-              onChange={(e) =>
-                setDbConfig({ 
-                  ...dbConfig, 
-                  database: e.target.value 
-                })
-              }
-            />
+              {basesDisponibles.map((nombre) => (
+                <option key={nombre} value={nombre}>
+                  {nombre}
+                </option>
+              ))}
+            </select>
 
             <div className="modal-buttons">
-              <button onClick={handleConnectDB}>
+              <button
+                onClick={handleConnectDB}
+                disabled={!baseSeleccionada}
+              >
                 Conectar
               </button>
               <button onClick={() => setShowModal(false)}>

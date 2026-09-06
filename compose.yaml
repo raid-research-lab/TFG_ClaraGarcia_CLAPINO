@@ -1,3 +1,15 @@
+# ======================================================================
+# CLAPINO - despliegue con Docker Compose
+#
+# Los ÚNICOS secretos de la aplicación viven en backend/.env
+# (SESSION_SECRET, OPENROUTER_API_KEY, GOOGLE_CLIENT_ID).
+#
+# Lo que hay aquí no es secreto: el Client ID de Google es público
+# (viaja en el propio JavaScript del navegador) y las contraseñas de
+# MySQL solo son válidas dentro de la red interna de Docker, que no
+# está expuesta al exterior.
+# ======================================================================
+
 services:
 
   database:
@@ -8,12 +20,10 @@ services:
       MYSQL_ROOT_PASSWORD: clapino
       MYSQL_DATABASE: ciclismo
 
-    ports:
-      - "3307:3306"
-
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./database/ciclismo.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/ciclismo.sql:/docker-entrypoint-initdb.d/01-ciclismo.sql
+      - ./database/usuario-lectura.sql:/docker-entrypoint-initdb.d/02-usuario-lectura.sql
 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pclapino"]
@@ -21,39 +31,65 @@ services:
       timeout: 5s
       retries: 20
 
+    restart: unless-stopped
+
+    # Sin 'ports': MySQL solo es accesible desde la red interna de Docker.
+    # Para depurar desde el propio servidor, descomenta:
+    # ports:
+    #   - "127.0.0.1:3307:3306"
+
   backend:
     build:
       context: ./backend
 
-    ports:
-      - "5000:5000"
-
+    # Aquí están los secretos reales
     env_file:
       - ./backend/.env
 
     environment:
       DB_HOST: database
       DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: clapino
+
+      # Usuario de SOLO LECTURA, creado en database/usuario-lectura.sql.
+      # El backend nunca se conecta como root.
+      DB_USER: clapino_ro
+      DB_PASSWORD: clapino_ro
+
+      # Bases de datos que el estudiante puede elegir, separadas por comas.
+      # El cliente solo puede pedir un nombre de esta lista.
+      ALLOWED_DATABASES: ciclismo
       DB_NAME: ciclismo
+
+      # Origen público desde el que se accede a la aplicación
+      PUBLIC_ORIGIN: https://initiot.unizar.es
 
     depends_on:
       database:
         condition: service_healthy
 
+    restart: unless-stopped
+
+    # Sin 'ports': el backend se alcanza a través del nginx del frontend.
+
   frontend:
     build:
       context: ./frontend
-      
-    env_file:
-      - ./frontend/.env
+
+      # Vite incrusta estas variables al COMPILAR, por eso son build args
+      # y no variables de entorno del contenedor.
+      # Si cambias el Client ID: docker compose build frontend
+      args:
+        VITE_GOOGLE_CLIENT_ID: 364837571869-3j8n15ndoe8qjb4h4gu626dk2rpfqnb2.apps.googleusercontent.com
+        VITE_API_BASE: /clapino/api
 
     ports:
-      - "5173:5173"
+      # Puerto público de la máquina 155.210.68.55 <-- cámbialo si hace falta
+      - "8095:80"
 
     depends_on:
       - backend
+
+    restart: unless-stopped
 
 volumes:
   mysql_data:

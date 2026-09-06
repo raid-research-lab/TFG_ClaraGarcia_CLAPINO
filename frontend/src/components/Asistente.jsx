@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE } from "../api";
 import "./Asistente.css";
 
 function Asistente({
@@ -183,9 +184,10 @@ function Asistente({
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/asistente",
+        `${API_BASE}/api/asistente`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json"
           },

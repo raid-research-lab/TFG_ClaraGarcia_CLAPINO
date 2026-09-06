@@ -198,17 +198,35 @@
   margin-top: 0;
 }
 
-.modal input {
+/* Texto explicativo del modal */
+.modal-texto {
+  margin: 0 0 16px;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modal input,
+.modal select {
   width: 100%;
   padding: 12px;
   margin-bottom: 12px;
   border-radius: 12px;
   border: 1px solid #d1d5db;
+  background: white;
+  font-size: 15px;
+  color: #111827;
 }
 
-.modal input:focus {
+.modal input:focus,
+.modal select:focus {
   outline: none;
   border-color: #2563eb;
+}
+
+.modal-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modal-buttons {

@@ -1,11 +1,12 @@
 import { GoogleLogin } from "@react-oauth/google";
+import { API_BASE } from "../api";
 
 function Inicio({ onEntrar }) {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/auth/google",
+        `${API_BASE}/auth/google`,
         {
           method: "POST",
 
