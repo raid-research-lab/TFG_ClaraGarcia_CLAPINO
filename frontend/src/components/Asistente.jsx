@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Mic } from "lucide-react";
 import { API_BASE } from "../api";
 import "./Asistente.css";
 
@@ -372,10 +373,10 @@ function Asistente({
                   type="button"
                   onClick={iniciarReconocimientoVoz}
                   disabled={cargando || escuchando}
-                  className="asistente-microfono"
-                  title="Hablar"
+                  className={`asistente-microfono ${escuchando ? "escuchando" : ""}`}
+                  title={escuchando ? "Escuchando..." : "Hablar"}
                 >
-                  {escuchando ? "🔴" : "🎤"}
+                  <Mic size={20} strokeWidth={2} />
                 </button>
 
                 <button

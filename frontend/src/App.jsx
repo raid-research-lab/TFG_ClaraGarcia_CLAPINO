@@ -126,10 +126,6 @@ function App() {
   const addToCRT = (symbol) => {
     setCrtQuery(crtQuery + symbol + " ");
   };
-
-  /*const addToAR = (symbol) => {
-    setArQuery(arQuery + symbol + " ");
-  };*/
   
 
   const clearAll = () => {
